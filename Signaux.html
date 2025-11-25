@@ -1,0 +1,1674 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <title>QCM - Introduction au Traitement du Signal - Chapitre 3</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    :root {
+      --bg: #020617;
+      --bg-card: #0b1120;
+      --bg-soft: #020617;
+      --accent: #3b82f6;
+      --accent-soft: #1f2937;
+      --text: #e5e7eb;
+      --muted: #9ca3af;
+      --correct: #16a34a;
+      --wrong: #dc2626;
+      --border-radius-lg: 18px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+        sans-serif;
+      background: radial-gradient(circle at top, #1f2937 0, #020617 55%);
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    .page {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 1.2rem 1.2rem 2.4rem;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 1rem;
+    }
+
+    header h1 {
+      font-size: 1.4rem;
+      margin: 0;
+    }
+
+    header p {
+      margin: 0.4rem 0 0;
+      font-size: 0.9rem;
+      color: var(--muted);
+    }
+
+    @media (min-width: 768px) {
+      header h1 {
+        font-size: 1.8rem;
+      }
+      header p {
+        font-size: 1rem;
+      }
+    }
+
+    .card {
+      background: rgba(15, 23, 42, 0.96);
+      border-radius: var(--border-radius-lg);
+      padding: 1.4rem 1.1rem;
+      box-shadow: 0 18px 55px rgba(0, 0, 0, 0.7);
+      border: 1px solid rgba(148, 163, 184, 0.18);
+    }
+
+    @media (min-width: 768px) {
+      .card {
+        padding: 1.8rem 1.6rem;
+      }
+    }
+
+    .mode-selector {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 0.6rem;
+      margin-bottom: 0.6rem;
+      flex-wrap: wrap;
+    }
+
+    .mode-selector select {
+      background: var(--bg-soft);
+      color: var(--text);
+      border-radius: 999px;
+      border: 1px solid rgba(148, 163, 184, 0.7);
+      padding: 0.35rem 0.8rem;
+      font-size: 0.85rem;
+    }
+
+    .mode-selector select:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 1px rgba(59, 130, 246, 0.4);
+    }
+
+    .badge {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      padding: 0.25rem 0.55rem;
+      border-radius: 999px;
+      border: 1px solid rgba(148, 163, 184, 0.6);
+      color: var(--muted);
+    }
+
+    .badge.small-badge {
+      font-size: 0.7rem;
+    }
+
+    .quiz-header {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.6rem;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 0.9rem;
+    }
+
+    .quiz-meta {
+      font-size: 0.9rem;
+      color: var(--muted);
+      display: flex;
+      gap: 0.8rem;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    .quiz-meta strong {
+      color: var(--text);
+    }
+
+    .progress-wrapper {
+      margin-top: 0.55rem;
+      width: 100%;
+    }
+
+    .progress-bar {
+      width: 100%;
+      height: 6px;
+      border-radius: 999px;
+      background: #020617;
+      overflow: hidden;
+    }
+
+    .progress-bar-inner {
+      height: 100%;
+      width: 0;
+      background: var(--accent);
+      transition: width 0.2s ease-out;
+    }
+
+    .question-text {
+      margin-top: 0.9rem;
+      font-size: 1.05rem;
+      font-weight: 600;
+      line-height: 1.4;
+    }
+
+    @media (min-width: 768px) {
+      .question-text {
+        font-size: 1.15rem;
+      }
+    }
+
+    .answers-list {
+      list-style: none;
+      padding: 0;
+      margin: 1rem 0 0.4rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.7rem;
+    }
+
+    .answer-btn {
+      width: 100%;
+      border-radius: 0.9rem;
+      border: 1px solid var(--accent-soft);
+      padding: 0.7rem 0.85rem;
+      background: var(--bg-soft);
+      color: var(--text);
+      font-size: 0.97rem;
+      text-align: left;
+      display: flex;
+      gap: 0.7rem;
+      align-items: flex-start;
+      cursor: pointer;
+      transition: border-color 0.15s ease, transform 0.05s ease,
+        box-shadow 0.1s ease, background-color 0.15s ease;
+    }
+
+    .answer-btn:hover,
+    .answer-btn:focus-visible {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 1px rgba(59, 130, 246, 0.3);
+      transform: translateY(-1px);
+    }
+
+    .answer-btn:active {
+      transform: translateY(0);
+      box-shadow: none;
+    }
+
+    .answer-index {
+      flex-shrink: 0;
+      font-weight: 600;
+      opacity: 0.8;
+      min-width: 1.4rem;
+    }
+
+    .answer-label {
+      flex: 1;
+    }
+
+    .answer-btn.correct {
+      border-color: rgba(22, 163, 74, 0.85);
+      background: rgba(22, 163, 74, 0.15);
+      box-shadow: 0 0 0 1px rgba(22, 163, 74, 0.5);
+    }
+
+    .answer-btn.wrong {
+      border-color: rgba(220, 38, 38, 0.85);
+      background: rgba(220, 38, 38, 0.12);
+      box-shadow: 0 0 0 1px rgba(220, 38, 38, 0.4);
+    }
+
+    .answer-btn.disabled {
+      cursor: default;
+      opacity: 0.9;
+    }
+
+    .feedback {
+      min-height: 2.1rem;
+      font-size: 0.9rem;
+      margin-top: 0.4rem;
+      color: var(--muted);
+    }
+
+    .feedback.visible {
+      color: var(--text);
+    }
+
+    .controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.6rem;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 1rem;
+    }
+
+    .control-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.6rem;
+    }
+
+    button {
+      font-family: inherit;
+    }
+
+    .btn-primary,
+    .btn-ghost {
+      border-radius: 999px;
+      padding: 0.5rem 1.1rem;
+      font-size: 0.9rem;
+      border: none;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      transition: transform 0.05s ease, box-shadow 0.1s ease,
+        background-color 0.12s ease, opacity 0.15s ease;
+      white-space: nowrap;
+    }
+
+    .btn-primary {
+      background: var(--accent);
+      color: #0b1120;
+      font-weight: 600;
+      box-shadow: 0 10px 30px rgba(37, 99, 235, 0.5);
+    }
+
+    .btn-primary:hover {
+      box-shadow: 0 14px 35px rgba(37, 99, 235, 0.7);
+      transform: translateY(-1px);
+    }
+
+    .btn-primary:active {
+      transform: translateY(0);
+      box-shadow: none;
+    }
+
+    .btn-ghost {
+      background: rgba(15, 23, 42, 0.8);
+      color: var(--muted);
+      border: 1px solid rgba(148, 163, 184, 0.7);
+    }
+
+    .btn-ghost:hover {
+      background: rgba(15, 23, 42, 1);
+      color: var(--text);
+    }
+
+    .btn-primary:disabled,
+    .btn-ghost:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+      box-shadow: none;
+      transform: none;
+    }
+
+    .score {
+      font-size: 0.9rem;
+      color: var(--muted);
+    }
+
+    .score strong {
+      color: var(--text);
+    }
+
+    .footer-text {
+      margin-top: 0.8rem;
+      font-size: 0.8rem;
+      color: var(--muted);
+      text-align: center;
+    }
+
+    @media (max-width: 520px) {
+      .controls {
+        flex-direction: column;
+        align-items: stretch;
+      }
+      .control-group {
+        justify-content: space-between;
+      }
+      .btn-primary,
+      .btn-ghost {
+        flex: 1;
+        justify-content: center;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <header>
+      <h1>QCM interactif — Introduction au Traitement du Signal</h1>
+      <p>Chapitre 3 : Fenêtrage, Filtrage et Produit de Convolution — révision complète</p>
+    </header>
+
+    <main class="card" aria-live="polite">
+      <div class="mode-selector">
+        <span class="badge small-badge">Mode de révision</span>
+        <select id="mode-select">
+          <option value="30">Série de 30 questions</option>
+          <option value="50">Série de 50 questions</option>
+          <option value="all" selected>Toute la banque</option>
+        </select>
+      </div>
+
+      <div class="quiz-header">
+        <span class="badge">Chapitre 3 – QCM</span>
+        <div class="quiz-meta">
+          <span>Question <strong id="question-number">1</strong>/<span id="total-questions">0</span></span>
+          <span>Score : <strong id="score">0 / 0</strong></span>
+        </div>
+        <div class="progress-wrapper">
+          <div class="progress-bar">
+            <div class="progress-bar-inner" id="progress-bar-inner"></div>
+          </div>
+        </div>
+      </div>
+
+      <h2 class="question-text" id="question-text">
+        Chargement de la question...
+      </h2>
+
+      <ul class="answers-list" id="answers-list">
+        <!-- Boutons de réponses générés en JavaScript -->
+      </ul>
+
+      <div class="feedback" id="feedback"></div>
+
+      <div class="controls">
+        <div class="control-group">
+          <button id="prev-btn" class="btn-ghost" type="button">
+            ← Précédent
+          </button>
+          <button id="next-btn" class="btn-primary" type="button">
+            Suivant →
+          </button>
+        </div>
+        <div class="control-group">
+          <button id="reset-btn" class="btn-ghost" type="button">
+            Réinitialiser le QCM
+          </button>
+        </div>
+      </div>
+
+      <p class="footer-text">
+        Astuce : tu peux revenir en arrière pour revoir la correction d’une question déjà répondue.
+      </p>
+    </main>
+  </div>
+
+  <script>
+    // ============================
+    //   BANQUE DE QUESTIONS COMPLÈTE
+    // ============================
+
+    const fullQuestions = [
+      // 1–6 : Introduction du chapitre
+      {
+        question: "Dans le chapitre 3, quelles sont les deux opérations étudiées en priorité sur les signaux ?",
+        choices: [
+          "La dérivation et l’intégration temporelle",
+          "Le fenêtrage et le filtrage",
+          "La modulation AM et FM",
+          "L’échantillonnage et la quantification"
+        ],
+        correctIndex: 1
+      },
+      {
+        question: "Dans le cours, le fenêtrage est présenté comme une opération réalisée :",
+        choices: [
+          "Dans le domaine fréquentiel",
+          "Dans le domaine temporel",
+          "Dans le domaine spatial",
+          "Uniquement dans le domaine de Laplace"
+        ],
+        correctIndex: 1
+      },
+      {
+        question: "Dans le cours, le filtrage est présenté comme une opération réalisée :",
+        choices: [
+          "Dans le domaine temporel",
+          "Dans le domaine fréquentiel",
+          "Dans le domaine spatial",
+          "Uniquement dans le domaine complexe p"
+        ],
+        correctIndex: 1
+      },
+      {
+        question: "Quel est l’objectif global du chapitre 3 sur fenêtrage et filtrage ?",
+        choices: [
+          "Étudier uniquement des systèmes non linéaires",
+          "Comparer les coûts matériels de différents filtres",
+          "Étudier les effets du fenêtrage et du filtrage dans les deux domaines temps / fréquence et identifier l’opérateur mathématique qui les relie",
+          "Étudier seulement les signaux aléatoires"
+        ],
+        correctIndex: 2
+      },
+      {
+        question: "Dans l’introduction, on insiste sur :",
+        choices: [
+          "L’étude du bruit thermique uniquement",
+          "L’étude de deux opérations (fenêtrage et filtrage) et de leur effet dans l’autre domaine (temps/fréquence)",
+          "L’étude de la transformée de Laplace uniquement",
+          "L’étude de la transformée en ondelettes"
+        ],
+        correctIndex: 1
+      },
+      {
+        question: "Parmi ces propositions, laquelle caractérise correctement un signal après fenêtrage ou filtrage dans le contexte du cours ?",
+        choices: [
+          "Le signal est toujours périodique",
+          "Le signal est toujours aléatoire",
+          "Le signal est transformé soit par multiplication par une fonction porte, soit par multiplication par un spectre de filtre",
+          "Le signal devient toujours nul"
+        ],
+        correctIndex: 2
+      },
+
+      // 7–18 : Fenêtrage temporel
+      {
+        question: "Le fenêtrage d’un signal x(t) est décrit dans le cours comme :",
+        choices: [
+          "Une opération qui consiste à ajouter un bruit à x(t)",
+          "Une opération qui consiste à différencier x(t)",
+          "Une opération qui consiste à prélever une partie de x(t) sur un intervalle de temps donné",
+          "Une opération qui consiste à rendre x(t) périodique"
+        ],
+        correctIndex: 2
+      },
+      {
+        question: "Pour réaliser un fenêtrage, on multiplie le signal x(t) par :",
+        choices: [
+          "Une fonction exponentielle",
+          "Une fonction porte w(t)",
+          "Une fonction aléatoire",
+          "Une fonction sinus"
+        ],
+        correctIndex: 1
+      },
+      {
+        question: "Dans la modélisation du fenêtrage, y(t) désigne :",
+        choices: [
+          "Le signal avant fenêtrage",
+          "Le bruit ajouté au signal",
+          "Le signal après fenêtrage",
+          "La fenêtre utilisée"
+        ],
+        correctIndex: 2
+      },
+      {
+        question: "L’équation de base modélisant le fenêtrage dans le cours est :",
+        choices: [
+          "y(t) = x(t) + w(t)",
+          "y(t) = w(t) · x(t)",
+          "y(t) = x(t) / w(t)",
+          "y(t) = x(t − w(t))"
+        ],
+        correctIndex: 1
+      },
+      {
+        question: "Dans le cours, la fenêtre w(t) est décrite comme :",
+        choices: [
+          "Une fonction égale à 1 sur tout ℝ",
+          "Une fonction porte égale à 1 sur l’intervalle de prélèvement T et 0 ailleurs",
+          "Une fonction uniquement décroissante",
+          "Une fonction aléatoire centrée"
+        ],
+        correctIndex: 1
+      },
+      {
+        question: "Matériellement, la fenêtre est comparée à :",
+        choices: [
+          "Une résistance variable",
+          "Une source de courant",
+          "Un interrupteur fermé sur l’intervalle de prélèvement et ouvert le reste du temps",
+          "Un voltmètre idéal"
+        ],
+        correctIndex: 2
+      },
+      {
+        question: "Le but du fenêtrage est principalement :",
+        choices: [
+          "D’ajouter de nouvelles fréquences au signal",
+          "De distinguer les composantes aléatoires",
+          "De n’observer qu’une partie du signal sur un intervalle de temps donné",
+          "D’augmenter la puissance moyenne du signal"
+        ],
+        correctIndex: 2
+      },
+      {
+        question: "Dans le cours, w(t) utilisée pour fenêtrer un signal est appelée :",
+        choices: [
+          "Filtre",
+          "Réponse impulsionnelle",
+          "Fenêtre",
+          "Fonction de transfert"
+        ],
+        correctIndex: 2
+      },
+      {
+        question: "Si la durée de prélèvement est notée T, la fenêtre rectangulaire wrect(t) est égale à 1 pour :",
+        choices: [
+          "|t| ≥ T/2",
+          "|t| ≤ T/2",
+          "t < 0 uniquement",
+          "t > 0 uniquement"
+        ],
+        correctIndex: 1
+      },
+      {
+        question: "Selon le cours, la fenêtre rectangulaire wrect(t) vaut 0 :",
+        choices: [
+          "Pour |t| ≤ T/2",
+          "Pour |t| > T/2",
+          "Uniquement pour t = 0",
+          "Uniquement pour t = T/2"
+        ],
+        correctIndex: 1
+      },
+      {
+        question: "La fonction porte ΠT(t) utilisée dans l’exemple de fenêtrage est :",
+        choices: [
+          "Une sinusoïde",
+          "Une fonction exponentielle",
+          "Une fonction porte de durée T centrée sur 0",
+          "Une fonction de Dirac centrée en T"
+        ],
+        correctIndex: 2
+      },
+
+      // 19–30 : Fenêtrage dans le domaine fréquentiel
+      {
+        question: "Soient X(f), Y(f) et W(f) les transformées de Fourier de x(t), y(t) et w(t). Dans le cours, ces grandeurs sont liées par :",
+        choices: [
+          "X(f) = Y(f) · W(f)",
+          "Y(f) = X(f) + W(f)",
+          "Y(f) = W(f) ⊗ X(f)",
+          "W(f) = X(f) · Y(f)"
+        ],
+        correctIndex: 2
+      },
+      {
+        question: "Dans le raisonnement sur le fenêtrage, on commence par écrire x(t), y(t) et w(t) à partir de leurs transformées :",
+        choices: [
+          "En utilisant la transformée de Laplace",
+          "En utilisant la transformée de Fourier inverse",
+          "En utilisant la dérivée temporelle",
+          "En utilisant une corrélation"
+        ],
+        correctIndex: 1
+      },
+      {
+        question: "La démonstration montrant que w(t)·x(t) se transforme en convolution W(f) ⊗ X(f) utilise :",
+        choices: [
+          "Un changement de variable u + v = f",
+          "Uniquement des dérivées partielles",
+          "Uniquement une intégration par parties",
+          "Une approximation numérique"
+        ],
+        correctIndex: 0
+      },
+      {
+        question: "À l’issue du calcul dans le cours, l’opération de fenêtrage vérifie :",
+        choices: [
+          "w(t) · x(t) F⇌ W(f) + X(f)",
+          "w(t) · x(t) F⇌ W(f) · X(f)",
+          "w(t) · x(t) F⇌ W(f) ⊗ X(f)",
+          "w(t) + x(t) F⇌ W(f) · X(f)"
+        ],
+        correctIndex: 2
+      },
+      {
+        question: "L’opération de fenêtrage dans le domaine temporel correspond en fréquence à :",
+        choices: [
+          "Un simple décalage de spectre",
+          "Une convolution du spectre du signal par celui de la fenêtre",
+          "Une dérivation du spectre",
+          "Une corrélation auto-spectrale"
+        ],
+        correctIndex: 1
+      },
+      {
+        question: "Dans le cours, l’opérateur noté \"⊗\" désigne :",
+        choices: [
+          "Le produit scalaire",
+          "Le produit de convolution",
+          "La corrélation croisée",
+          "La transformée de Fourier"
+        ],
+        correctIndex: 1
+      },
+      {
+        question: "Dans le cours, l’opérateur de convolution a(x) ⊗ b(x) est défini par :",
+        choices: [
+          "a(x) ⊗ b(x) = a(x) · b(x)",
+          "a(x) ⊗ b(x) = ∫ a(x)b(u)du",
+          "a(x) ⊗ b(x) = ∫_{−∞}^{+∞} a(u) · b(x − u) du",
+          "a(x) ⊗ b(x) = a(x) + b(x)"
+        ],
+        correctIndex: 2
+      },
+      {
+        question: "Lorsqu’on applique le fenêtrage dans le domaine temporel, l’effet observé dans le domaine fréquentiel est :",
+        choices: [
+          "Un simple décalage du spectre",
+          "Une dilution du spectre dans le temps",
+          "Une convolution du spectre du signal par le spectre de la fenêtre",
+          "Une annulation systématique de toutes les basses fréquences"
+        ],
+        correctIndex: 2
+      },
+      {
+        question: "L’exemple de fenêtrage du cours considère un signal x(t) :",
+        choices: [
+          "Impulsionnel (Dirac)",
+          "Rectangulaire en temps",
+          "Sinusoïdal pair de fréquence f0",
+          "Exponentiel décroissant"
+        ],
+        correctIndex: 2
+      },
+      {
+        question: "Dans l’exemple de fenêtrage, on prélève x(t) sur l’intervalle :",
+        choices: [
+          "[0, T]",
+          "[−T, T]",
+          "[−T/2, T/2]",
+          "[0, T/2]"
+        ],
+        correctIndex: 2
+      },
+      {
+        question: "Dans cet exemple de fenêtrage, le spectre W(f) de la fenêtre ΠT(t) est :",
+        choices: [
+          "Une fonction constante",
+          "Un Dirac en f0",
+          "Une fonction sinc : T · sinc(Tf)",
+          "Une rampe linéaire"
+        ],
+        correctIndex: 2
+      },
+      {
+        question: "Dans l’exemple de fenêtrage, le spectre Y(f) de la partie prélevée du cosinus est :",
+        choices: [
+          "Un Dirac unique en 0 Hz",
+          "Deux Dirac non modifiés en ±f0",
+          "Deux sinc centrés en ±f0 d’amplitude T/2",
+          "Un bruit blanc"
+        ],
+        correctIndex: 2
+      },
+
+      // 31–45 : Fenêtres usuelles (formules)
+      {
+        question: "La fenêtre triangulaire wtriang(t) est définie dans le cours par :",
+        choices: [
+          "wtriang(t) = 1 pour |t| ≤ T/2, 0 sinon",
+          "wtriang(t) = 1 − |t|/(T/2) pour |t| ≤ T/2, 0 sinon",
+          "wtriang(t) = cos(2πt/T) pour tout t",
+          "wtriang(t) = δ(t)"
+        ],
+        correctIndex: 1
+      },
+      {
+        question: "La fenêtre de Hann (Hanning) whann(t) est donnée dans le cours par :",
+        choices: [
+          "whann(t) = 1/2 [1 + cos(2πt/T)] pour |t| ≤ T/2, 0 sinon",
+          "whann(t) = cos(2πt/T) pour tout t",
+          "whann(t) = 0.5 + 0.5 sin(2πt/T) pour tout t",
+          "whann(t) = 1 pour |t| ≤ T, 0 sinon"
+        ],
+        correctIndex: 0
+      },
+      {
+        question: "La fenêtre de Hamming whamming(t) est écrite dans le cours :",
+        choices: [
+          "whamming(t) = 0.5 + 0.5 cos(2πt/T) pour |t| ≤ T/2, 0 sinon",
+          "whamming(t) = 0.54 + 0.46 cos(2πt/T) pour |t| ≤ T/2, 0 sinon",
+          "whamming(t) = 0.46 + 0.54 cos(2πt/T) pour tout t",
+          "whamming(t) = cos(4πt/T) pour |t| ≤ T/2, 0 sinon"
+        ],
+        correctIndex: 1
+      },
+      {
+        question: "La fenêtre de Blackman wblackman(t) est donnée par :",
+        choices: [
+          "wblackman(t) = 0.42 + 0.5 cos(2πt/T) + 0.08 cos(4πt/T)",
+          "wblackman(t) = 0.42 + 0.5 sin(2πt/T)",
+          "wblackman(t) = 0.5 cos(2πt/T) + 0.5 cos(4πt/T)",
+          "wblackman(t) = 0.42 cos(2πt/T) + 0.5 cos(4πt/T)"
+        ],
+        correctIndex: 0
+      },
+      {
+        question: "La fenêtre de Kaiser wkaiser(t) fait intervenir dans sa définition :",
+        choices: [
+          "Une fonction de Dirac",
+          "Une fonction de Bessel modifiée d’ordre 0 notée I0",
+          "Une fonction exponentielle pure",
+          "Un polynôme de degré 2"
+        ],
+        correctIndex: 1
+      },
+      {
+        question: "Dans la fenêtre de Kaiser, le paramètre β sert à :",
+        choices: [
+          "Régler l’amplitude maximale du signal d’entrée",
+          "Régler la position temporelle de la fenêtre",
+          "Régler la largeur du lobe principal en fréquence",
+          "Régler la période de la fenêtre"
+        ],
+        correctIndex: 2
+      },
+      {
+        question: "Dans la figure des fenêtres continues, celles-ci sont centrées sur :",
+        choices: [
+          "[0, T]",
+          "[−T, T]",
+          "[−T/2, T/2]",
+          "[0, T/2]"
+        ],
+        correctIndex: 2
+      },
+      {
+        question: "Parmi les fenêtres suivantes, laquelle correspond à un simple \"bout de signal\" sans pondération supplémentaire ?",
+        choices: [
+          "Fenêtre de Hann",
+          "Fenêtre rectangulaire",
+          "Fenêtre de Hamming",
+          "Fenêtre de Blackman"
+        ],
+        correctIndex: 1
+      },
+      {
+        question: "La fenêtre rectangulaire présente, en général, dans le domaine fréquentiel :",
+        choices: [
+          "Un lobe principal très large et des lobes secondaires très faibles",
+          "Un lobe principal très étroit mais des lobes secondaires relativement élevés",
+          "Un spectre nul partout",
+          "Un spectre constant"
+        ],
+        correctIndex: 1
+      },
+      {
+        question: "Les fenêtres plus \"douces\" (Hann, Hamming, Blackman) ont en général pour effet sur le spectre :",
+        choices: [
+          "D’augmenter la fuite spectrale",
+          "De réduire les lobes secondaires au prix d’un lobe principal plus large",
+          "De supprimer entièrement la composante continue",
+          "De créer des raies discrètes supplémentaires"
+        ],
+        correctIndex: 1
+      },
+      {
+        question: "Selon le cours, les fenêtres non rectangulaires sont souvent utilisées pour :",
+        choices: [
+          "L’échantillonnage analogique",
+          "La corrélation croisée",
+          "Le filtrage numérique (conception de filtres RIF/FIR)",
+          "La modulation d’amplitude"
+        ],
+        correctIndex: 2
+      },
+      {
+        question: "Quel compromis fondamental les différentes fenêtres temporelles illustrent-elles ?",
+        choices: [
+          "Entre temps de calcul et consommation mémoire",
+          "Entre largeur du lobe principal et niveau des lobes secondaires",
+          "Entre amplitude et phase",
+          "Entre temps continu et temps discret"
+        ],
+        correctIndex: 1
+      },
+
+      // 46–60 : Filtrage, définition et domaine fréquentiel
+      {
+        question: "Dans la section Filtrage, l’opération de filtrage est présentée comme :",
+        choices: [
+          "Une opération identique au fenêtrage mais dans le domaine fréquentiel",
+          "Une opération identique au fenêtrage dans le domaine temporel",
+          "Une simple addition de spectres",
+          "Une dérivation en fréquence"
+        ],
+        correctIndex: 0
+      },
+      {
+        question: "Pour filtrer un signal X(f), on utilise dans le domaine fréquentiel :",
+        choices: [
+          "Une fonction porte temporelle w(t)",
+          "Une fonction porte fréquentielle H(f)",
+          "Une fonction de Dirac en temps",
+          "Une fenêtre triangulaire uniquement"
+        ],
+        correctIndex: 1
+      },
+      {
+        question: "Dans le cours, H(f) est décrite comme :",
+        choices: [
+          "Le spectre du bruit",
+          "Le spectre du filtre (fonction porte en fréquence)",
+          "La transformée de Laplace",
+          "La densité spectrale d’un processus aléatoire"
+        ],
+        correctIndex: 1
+      },
+      {
+        question: "L’équation de base du filtrage fréquentiel est :",
+        choices: [
+          "Y(f) = X(f) + H(f)",
+          "Y(f) = X(f) / H(f)",
+          "Y(f) = H(f) · X(f)",
+          "Y(f) = H(f) ⊗ X(f)"
+        ],
+        correctIndex: 2
+      },
+      {
+        question: "Dans le cours, la fonction porte ΠF(f) utilisée en filtrage représente :",
+        choices: [
+          "Une fenêtre en temps",
+          "Un spectre de filtre idéal en fréquence",
+          "Une excitation impulsionnelle",
+          "Une fonction d’auto-corrélation"
+        ],
+        correctIndex: 1
+      },
+      {
+        question: "Un filtre passe-bas idéal est décrit dans le cours comme :",
+        choices: [
+          "Ne laissant passer que les hautes fréquences",
+          "Ne laissant passer que les basses fréquences entre 0 et fc",
+          "Ne laissant passer qu’une fréquence unique",
+          "Ne laissant passer aucune fréquence"
+        ],
+        correctIndex: 1
+      },
+      {
+        question: "Un filtre passe-haut idéal selon le cours :",
+        choices: [
+          "Ne laisse passer que les fréquences inférieures à fc",
+          "Laisse passer toutes les fréquences",
+          "Ne laisse passer que les fréquences supérieures à fc",
+          "Amplifie toutes les fréquences de la même façon"
+        ],
+        correctIndex: 2
+      },
+      {
+        question: "Un filtre passe-bande idéal :",
+        choices: [
+          "Ne laisse passer que les fréquences entre fc1 et fc2",
+          "Laisse passer toutes les fréquences sauf entre fc1 et fc2",
+          "Ne laisse passer que la composante continue",
+          "Ne laisse passer que les très hautes fréquences"
+        ],
+        correctIndex: 0
+      },
+      {
+        question: "Un filtre coupe-bande (notch) :",
+        choices: [
+          "Ne laisse passer que les fréquences entre fc1 et fc2",
+          "Supprime toutes les fréquences",
+          "Laisse passer toutes les fréquences sauf celles entre fc1 et fc2",
+          "Ne laisse passer que la composante continue"
+        ],
+        correctIndex: 2
+      },
+      {
+        question: "Les filtres dont le spectre H(f) est une fonction porte parfaite sont appelés :",
+        choices: [
+          "Réalisables",
+          "Physiques",
+          "Idéaux",
+          "Numériques"
+        ],
+        correctIndex: 2
+      },
+      {
+        question: "Selon le cours, les filtres idéaux ne sont pas réalisables matériellement car :",
+        choices: [
+          "Ils nécessitent une énergie infinie",
+          "Leur spectre présente une discontinuité parfaite en fréquence",
+          "Ils ne peuvent pas être implantés en numérique",
+          "Ils ne respectent pas le théorème de Shannon"
+        ],
+        correctIndex: 1
+      },
+      {
+        question: "Les filtres analogiques réalisables présentés dans le cours sont réalisés avec :",
+        choices: [
+          "Uniquement des amplificateurs opérationnels",
+          "Résistances, condensateurs, inductances et parfois amplificateurs opérationnels",
+          "Des convertisseurs analogique-numérique",
+          "Des registres et bascules"
+        ],
+        correctIndex: 1
+      },
+      {
+        question: "Un filtre analogique dont H(f) est une \"fonction de transfert\" plutôt qu’une fonction porte possède :",
+        choices: [
+          "Un spectre parfaitement rectangulaire",
+          "Un spectre lisse avec des transitions progressives",
+          "Un spectre nul partout",
+          "Un spectre infini pour certaines fréquences"
+        ],
+        correctIndex: 1
+      },
+      {
+        question: "Dans la pratique, la fréquence de coupure fc d’un filtre passe-bas analogique est souvent définie à :",
+        choices: [
+          "−1 dB",
+          "−3 dB",
+          "−6 dB",
+          "0 dB"
+        ],
+        correctIndex: 1
+      },
+
+      // 61–75 : Filtrage dans le domaine temporel & Plancherel
+      {
+        question: "Dans la section \"Filtrage dans le domaine temporel\", H(f) est exprimée comme transformée de Fourier de :",
+        choices: [
+          "x(t)",
+          "y(t)",
+          "h(t), la réponse impulsionnelle du filtre",
+          "w(t), la fenêtre"
+        ],
+        correctIndex: 2
+      },
+      {
+        question: "Dans la démonstration, on exprime X(f), Y(f) et H(f) comme transformées de Fourier de x(t), y(t) et h(t). On arrive finalement à :",
+        choices: [
+          "y(t) = x(t) + h(t)",
+          "y(t) = x(t) · h(t)",
+          "y(t) = ∫ h(u) · x(t − u) du",
+          "y(t) = ∫ x(u) · h(t + u) du"
+        ],
+        correctIndex: 2
+      },
+      {
+        question: "La relation marquée (**) dans le cours relie le temps et la fréquence par :",
+        choices: [
+          "∫ h(u)x(u) du F⇌ H(f) + X(f)",
+          "∫ h(u)x(t − u) du F⇌ H(f) · X(f)",
+          "∫ h(u)x(t − u) du F⇌ H(f) ⊗ X(f)",
+          "h(t)x(t) F⇌ H(f) · X(f)"
+        ],
+        correctIndex: 1
+      },
+      {
+        question: "Le signal h(t) est interprété, dans le contexte du filtrage linéaire invariant, comme :",
+        choices: [
+          "La fenêtre de mesure",
+          "La réponse impulsionnelle du système (filtre)",
+          "Le bruit de mesure",
+          "Le signal d’entrée"
+        ],
+        correctIndex: 1
+      },
+      {
+        question: "Le théorème de Plancherel, tel que formulé dans le cours pour la variable f, indique que :",
+        choices: [
+          "w(t) · x(t) F⇌ W(f) · X(f)",
+          "w(t) · x(t) F⇌ W(f) ⊗ X(f)",
+          "h(t) ⊗ x(t) F⇌ H(f) ⊗ X(f)",
+          "h(t) ⊗ x(t) F⇌ H(f) + X(f)"
+        ],
+        correctIndex: 1
+      },
+      {
+        question: "Toujours selon Plancherel (variable f), la convolution temporelle h(t) ⊗ x(t) se traduit par :",
+        choices: [
+          "H(f) ⊗ X(f)",
+          "H(f) + X(f)",
+          "H(f) · X(f)",
+          "H(f) / X(f)"
+        ],
+        correctIndex: 2
+      },
+      {
+        question: "Le cours précise que la transformée de Fourier \"transforme\" :",
+        choices: [
+          "Le produit de convolution en somme simple",
+          "Le produit simple en produit de convolution et la convolution en produit simple",
+          "Le produit simple en dérivée",
+          "La convolution en intégrale de corrélation"
+        ],
+        correctIndex: 1
+      },
+      {
+        question: "Lorsque la variable fréquentielle est la pulsation ω, le théorème de Plancherel s’écrit avec :",
+        choices: [
+          "Un facteur 2π devant les produits simples",
+          "Un facteur 1/(2π) devant la convolution en fréquence",
+          "Aucun facteur supplémentaire",
+          "Un facteur 1/(2π) devant la convolution en temps"
+        ],
+        correctIndex: 1
+      },
+      {
+        question: "Pour la variable ω, le cours donne la relation : w(t)·x(t) F⇌ …",
+        choices: [
+          "W(ω) · X(ω)",
+          "(1/2π) · W(ω) ⊗ X(ω)",
+          "2π · W(ω) ⊗ X(ω)",
+          "(1/2π) · W(ω) · X(ω)"
+        ],
+        correctIndex: 1
+      },
+      {
+        question: "Pour la variable ω, le cours donne la relation : h(t) ⊗ x(t) F⇌ …",
+        choices: [
+          "H(ω) ⊗ X(ω)",
+          "H(ω) + X(ω)",
+          "H(ω) · X(ω)",
+          "2π · H(ω) · X(ω)"
+        ],
+        correctIndex: 2
+      },
+      {
+        question: "Dans le domaine fréquentiel, le produit de convolution A(f) ⊗ B(f) est défini dans le cours par :",
+        choices: [
+          "A(f) ⊗ B(f) = A(f) · B(f)",
+          "A(f) ⊗ B(f) = ∫ A(u)B(u) du",
+          "A(f) ⊗ B(f) = ∫_{−∞}^{+∞} A(u) · B(f − u) du",
+          "A(f) ⊗ B(f) = A(f) + B(f)"
+        ],
+        correctIndex: 2
+      },
+      {
+        question: "Dans le domaine temporel, la convolution x(t) ⊗ y(t) :",
+        choices: [
+          "N’est jamais commutative",
+          "Est commutative : x(t) ⊗ y(t) = y(t) ⊗ x(t)",
+          "Est toujours nulle",
+          "Est définie uniquement pour les signaux discrets"
+        ],
+        correctIndex: 1
+      },
+
+      // 76–90 : Propriétés de la convolution & signaux usuels
+      {
+        question: "Selon le cours, la convolution est :",
+        choices: [
+          "Associative uniquement",
+          "Distributive uniquement",
+          "Commutative, associative et distributive par rapport à l’addition",
+          "Ni associative ni commutative"
+        ],
+        correctIndex: 2
+      },
+      {
+        question: "L’élément neutre du produit de convolution dans le domaine temporel est :",
+        choices: [
+          "Le signal nul",
+          "Le signal constant 1",
+          "L’impulsion de Dirac δ(t)",
+          "La fonction porte ΠT(t)"
+        ],
+        correctIndex: 2
+      },
+      {
+        question: "L’élément neutre du produit de convolution dans le domaine fréquentiel est :",
+        choices: [
+          "δ(f)",
+          "1/f",
+          "0",
+          "X(f)"
+        ],
+        correctIndex: 0
+      },
+      {
+        question: "Convoler x(t) avec δ(t − t0) a pour effet :",
+        choices: [
+          "D’annuler x(t)",
+          "De dériver x(t)",
+          "De décaler x(t) : x(t) ⊗ δ(t − t0) = x(t − t0)",
+          "De rendre x(t) périodique"
+        ],
+        correctIndex: 2
+      },
+      {
+        question: "Convoler X(f) avec δ(f − f0) a pour effet :",
+        choices: [
+          "Un décalage fréquentiel : X(f) ⊗ δ(f − f0) = X(f − f0)",
+          "Une annulation du spectre",
+          "Une dérivation en fréquence",
+          "Une mise à zéro de la composante continue"
+        ],
+        correctIndex: 0
+      },
+      {
+        question: "Le cours insiste sur le fait que le produit simple et le produit de convolution :",
+        choices: [
+          "Commutent toujours entre eux",
+          "Ne commutent pas en général et peuvent rendre certaines écritures ambiguës",
+          "Sont identiques",
+          "Sont tous deux des produits scalaires"
+        ],
+        correctIndex: 1
+      },
+      {
+        question: "Les écritures x(t) · y(t) ⊗ z(t) ou x(t) ⊗ y(t) · z(t) sont qualifiées dans le cours de :",
+        choices: [
+          "Toujours correctes",
+          "Ambiguës et à éviter",
+          "Équivalentes à x(t) · [y(t) ⊗ z(t)]",
+          "Équivalentes à [x(t) · y(t)] ⊗ z(t)"
+        ],
+        correctIndex: 1
+      },
+      {
+        question: "La transformée de Fourier d’une impulsion de Dirac δ(t) est :",
+        choices: [
+          "Une autre impulsion en fréquence",
+          "Une constante égale à 1 pour toutes les fréquences",
+          "Toujours nulle",
+          "Une rampe linéaire"
+        ],
+        correctIndex: 1
+      },
+      {
+        question: "La transformée de Fourier d’un signal constant 1 est :",
+        choices: [
+          "Un Dirac en fréquence nulle (0 Hz)",
+          "Un bruit blanc",
+          "Un cosinus",
+          "Un triangle"
+        ],
+        correctIndex: 0
+      },
+      {
+        question: "La transformée de Fourier d’un cosinus pur de fréquence f0 est :",
+        choices: [
+          "Un Dirac en 0 Hz",
+          "Deux Dirac en ±f0",
+          "Une fonction sinc",
+          "Un spectre constant"
+        ],
+        correctIndex: 1
+      },
+      {
+        question: "Un signal cosinus x(t) = cos(2πf0t) est :",
+        choices: [
+          "Aléatoire et apériodique",
+          "Déterministe et périodique",
+          "Toujours de moyenne nulle ET impair",
+          "Toujours de moyenne non nulle"
+        ],
+        correctIndex: 1
+      },
+      {
+        question: "Dans l’exemple de fenêtrage, le fait que le cosinus soit pair simplifie :",
+        choices: [
+          "La transformée de Laplace",
+          "La représentation temporelle",
+          "La représentation fréquentielle (spectre symétrique en ±f0)",
+          "La dérivation du signal"
+        ],
+        correctIndex: 2
+      },
+      {
+        question: "Le filtrage passe-bas d’un signal temporel a en général pour effet :",
+        choices: [
+          "D’accentuer les variations rapides (dérivation)",
+          "De lisser le signal en supprimant les hautes fréquences",
+          "De rendre le signal plus bruité",
+          "D’augmenter l’amplitude de toutes les composantes"
+        ],
+        correctIndex: 1
+      },
+
+      // 91–100 : Filtres analogiques et rappel Laplace
+      {
+        question: "Dans le cours, un exemple de filtre analogique passe-bas est réalisé à partir de :",
+        choices: [
+          "Un montage RC",
+          "Un montage RL seulement",
+          "Un convertisseur A/N",
+          "Un oscillateur"
+        ],
+        correctIndex: 0
+      },
+      {
+        question: "Un filtre RLC passe-bande présenté dans le cours a un spectre H(f) :",
+        choices: [
+          "Constant sur tout l’axe fréquentiel",
+          "Avec un maximum dans une bande de fréquences et une atténuation en dehors",
+          "Strictement décroissant de 0 à l’infini",
+          "Nul partout"
+        ],
+        correctIndex: 1
+      },
+      {
+        question: "Un filtre RLC coupe-bande présenté dans le cours :",
+        choices: [
+          "Ne laisse passer qu’une bande étroite autour d’une fréquence centrale",
+          "Supprime une bande de fréquences et laisse passer le reste",
+          "Supprime toutes les fréquences",
+          "Ne laisse passer que la composante continue"
+        ],
+        correctIndex: 1
+      },
+      {
+        question: "Les exemples de filtrage d’un signal dans le cours montrent notamment :",
+        choices: [
+          "Un déphasage et une atténuation après filtrage",
+          "Une amplification infinie des hautes fréquences",
+          "Une disparition complète du signal",
+          "Un signal toujours en avance de phase"
+        ],
+        correctIndex: 0
+      },
+      {
+        question: "Pour compenser l’atténuation due au filtrage analogique, le cours évoque :",
+        choices: [
+          "L’utilisation d’un amplificateur opérationnel après le filtre",
+          "Une diminution de la fréquence de coupure",
+          "Un changement du type de fenêtre temporelle",
+          "Un ajout de bruit blanc"
+        ],
+        correctIndex: 0
+      },
+      {
+        question: "Dans le \"petit retour au SS1\", la relation fondamentale d’un système linéaire invariant dans le domaine de Laplace est :",
+        choices: [
+          "Y(p) = X(p) + H(p)",
+          "Y(p) = H(p) · X(p)",
+          "Y(p) = X(p) / H(p)",
+          "Y(p) = H(p) ⊗ X(p)"
+        ],
+        correctIndex: 1
+      },
+      {
+        question: "Dans SS1, une méthode classique pour retrouver y(t) à partir de Y(p) = H(p)X(p) est :",
+        choices: [
+          "La décomposition en éléments simples et l’utilisation de tables de transformée de Laplace",
+          "La transformée en ondelettes",
+          "La méthode d’Euler explicite",
+          "La discrétisation par différences finies"
+        ],
+        correctIndex: 0
+      },
+      {
+        question: "Le chapitre 3 rappelle qu’il est également possible de calculer y(t) pour un système LTI via :",
+        choices: [
+          "y(t) = h(t) + x(t)",
+          "y(t) = h(t) · x(t)",
+          "y(t) = h(t) ⊗ x(t)",
+          "y(t) = x(t − h(t))"
+        ],
+        correctIndex: 2
+      },
+      {
+        question: "Parmi ces propositions, laquelle correspond le mieux à l’esprit du chapitre 3 ?",
+        choices: [
+          "Relier les domaines temporel, fréquentiel et de Laplace via des opérations de produit simple et de convolution",
+          "Étudier uniquement des signaux aléatoires",
+          "Étudier des systèmes non linéaires à temps discret",
+          "Étudier la quantification des signaux numériques"
+        ],
+        correctIndex: 0
+      },
+      {
+        question: "Au final, fenêtrage, filtrage et produit de convolution sont mis en relation dans le cours principalement grâce :",
+        choices: [
+          "Au théorème de Nyquist",
+          "Au théorème de Plancherel et aux propriétés de la transformée de Fourier",
+          "Au théorème central limite",
+          "Aux propriétés de la transformée en ondelettes"
+        ],
+        correctIndex: 1
+      },
+
+      // 101–fin : Compléments / cohérence globale
+      {
+        question: "Dans le cours, fenêtrage et filtrage sont deux opérations duales. Laquelle des affirmations suivantes résume correctement cette dualité ?",
+        choices: [
+          "Fenêtrage et filtrage sont tous deux des additions en temps",
+          "Fenêtrage : produit en temps ⇒ convolution en fréquence ; Filtrage : produit en fréquence ⇒ convolution en temps",
+          "Fenêtrage : convolution en temps ⇒ produit en fréquence ; Filtrage : convolution en fréquence ⇒ produit en temps",
+          "Fenêtrage agit uniquement sur la phase, filtrage uniquement sur l’amplitude"
+        ],
+        correctIndex: 1
+      },
+      {
+        question: "Le cours insiste sur le fait qu’en fenêtrage, on multiplie le signal par une fonction porte :",
+        choices: [
+          "En fréquence",
+          "En temps",
+          "En temps discret uniquement",
+          "En espace"
+        ],
+        correctIndex: 1
+      },
+      {
+        question: "Le cours insiste sur le fait qu’en filtrage, on multiplie le signal par une fonction porte :",
+        choices: [
+          "En temps",
+          "En espace",
+          "En fréquence",
+          "Uniquement pour les signaux discrets"
+        ],
+        correctIndex: 2
+      },
+      {
+        question: "La notion de \"fonction porte\" ΠT(t) ou ΠF(f) renvoie dans le cours à :",
+        choices: [
+          "Une fonction qui vaut 1 sur un certain intervalle et 0 ailleurs",
+          "Une fonction toujours positive et croissante",
+          "Un sinus amorti",
+          "Un Dirac"
+        ],
+        correctIndex: 0
+      },
+      {
+        question: "Dans la représentation des différentes fenêtres, le paramètre T = 1 indiqué sous la figure signifie que :",
+        choices: [
+          "La fenêtre est unitaire en amplitude uniquement",
+          "La durée totale de la fenêtre est normalisée à 1 seconde",
+          "La largeur du lobe principal vaut 1 Hz",
+          "La fréquence d’échantillonnage est de 1 Hz"
+        ],
+        correctIndex: 1
+      },
+      {
+        question: "Dans les exemples de réponses fréquentielles de filtres analogiques (RC, RLC), on observe en général :",
+        choices: [
+          "Des transitions progressives entre zones passantes et coupées",
+          "Des transitions parfaitement verticales",
+          "Une amplitude identique à 0 dB partout",
+          "Une phase toujours nulle"
+        ],
+        correctIndex: 0
+      },
+      {
+        question: "Un système linéaire et invariant dans le temps (LTI) peut être complètement caractérisé par :",
+        choices: [
+          "Une seule valeur scalaire",
+          "Une suite de valeurs aléatoires",
+          "Sa réponse impulsionnelle h(t)",
+          "Son seul gain DC (0 Hz)"
+        ],
+        correctIndex: 2
+      },
+      {
+        question: "Pour un système LTI, connaître h(t) permet de déterminer la sortie y(t) pour toute entrée x(t) en utilisant :",
+        choices: [
+          "Une simple addition",
+          "Le produit de convolution h(t) ⊗ x(t)",
+          "Une corrélation croisée",
+          "Une transformée de Laplace inverse sans autre information"
+        ],
+        correctIndex: 1
+      },
+      {
+        question: "Parmi ces phrases, laquelle correspond à la définition d’un filtre passe-bas telle que donnée en début de partie Filtrage ?",
+        choices: [
+          "Ne laisse passer que des hautes fréquences",
+          "Ne laisse passer que des basses fréquences entre 0 et fc",
+          "Ne laisse passer que des fréquences entre fc1 et fc2",
+          "Laisse passer toutes les fréquences sauf une bande autour d’une fréquence centrale"
+        ],
+        correctIndex: 1
+      },
+      {
+        question: "Dans le cours, les exemples de filtrage d’un signal illustrent principalement :",
+        choices: [
+          "La disparition totale de la composante continue",
+          "La différence entre filtrage passe-bas, passe-haut et passe-bande sur un même signal",
+          "Le bruit de quantification",
+          "L’aliasing dû à l’échantillonnage"
+        ],
+        correctIndex: 1
+      },
+      {
+        question: "Lorsque l’on applique d’abord un fenêtrage temporel puis un filtrage fréquentiel au même signal, on effectue :",
+        choices: [
+          "Uniquement deux produits en fréquence",
+          "Un produit en temps puis un produit en fréquence, donc deux convolutions associées dans l’autre domaine",
+          "Deux convolutions en temps",
+          "Aucune opération linéaire"
+        ],
+        correctIndex: 1
+      },
+      {
+        question: "Le chapitre 3 se concentre sur des signaux :",
+        choices: [
+          "À temps discret uniquement",
+          "À temps continu (pour les exemples de fenêtrage et filtrage analogique)",
+          "Uniquement aléatoires",
+          "Uniquement déterministes et à temps discret"
+        ],
+        correctIndex: 1
+      },
+      {
+        question: "Le lien entre les notations temporelles (t) et fréquentielles (f ou ω) présenté dans le chapitre 3 repose principalement sur :",
+        choices: [
+          "La transformée de Fourier et sa transformée inverse",
+          "La transformée de Laplace unilatérale uniquement",
+          "La transformée en ondelettes discrète",
+          "La transformée de Hilbert"
+        ],
+        correctIndex: 0
+      }
+    ];
+
+    // ============================
+    //   LOGIQUE DU QCM + MODES (30/50/ALL)
+    // ============================
+
+    const questionTextEl = document.getElementById("question-text");
+    const answersListEl = document.getElementById("answers-list");
+    const feedbackEl = document.getElementById("feedback");
+    const questionNumberEl = document.getElementById("question-number");
+    const totalQuestionsEl = document.getElementById("total-questions");
+    const scoreEl = document.getElementById("score");
+    const progressBarInnerEl = document.getElementById("progress-bar-inner");
+    const prevBtn = document.getElementById("prev-btn");
+    const nextBtn = document.getElementById("next-btn");
+    const resetBtn = document.getElementById("reset-btn");
+    const modeSelect = document.getElementById("mode-select");
+
+    let questions = [];
+    let currentQuestionIndex = 0;
+    let userAnswers = [];
+    let score = 0;
+
+    function updateScoreDisplay() {
+      scoreEl.textContent = score + " / " + questions.length;
+    }
+
+    function updateProgress() {
+      const ratio = (currentQuestionIndex + 1) / questions.length;
+      progressBarInnerEl.style.width = (ratio * 100).toFixed(1) + "%";
+    }
+
+    function createShuffledSubset(mode) {
+      const indices = fullQuestions.map((_, idx) => idx);
+
+      // Shuffle Fisher-Yates
+      for (let i = indices.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        const tmp = indices[i];
+        indices[i] = indices[j];
+        indices[j] = tmp;
+      }
+
+      let targetSize;
+      if (mode === "all") {
+        targetSize = fullQuestions.length;
+      } else {
+        const n = parseInt(mode, 10);
+        if (Number.isNaN(n) || n <= 0) {
+          targetSize = fullQuestions.length;
+        } else {
+          targetSize = Math.min(n, fullQuestions.length);
+        }
+      }
+
+      const subset = [];
+      for (let i = 0; i < targetSize; i++) {
+        subset.push(fullQuestions[indices[i]]);
+      }
+      return subset;
+    }
+
+    function startQuiz(mode) {
+      questions = createShuffledSubset(mode);
+      currentQuestionIndex = 0;
+      userAnswers = new Array(questions.length).fill(null);
+      score = 0;
+      renderQuestion();
+    }
+
+    function renderQuestion() {
+      const q = questions[currentQuestionIndex];
+      questionTextEl.textContent = q.question;
+      questionNumberEl.textContent = currentQuestionIndex + 1;
+      totalQuestionsEl.textContent = questions.length;
+      answersListEl.innerHTML = "";
+      feedbackEl.textContent = "";
+      feedbackEl.classList.remove("visible");
+
+      q.choices.forEach((choiceText, idx) => {
+        const li = document.createElement("li");
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.className = "answer-btn";
+        btn.dataset.index = idx;
+
+        const indexSpan = document.createElement("span");
+        indexSpan.className = "answer-index";
+        indexSpan.textContent = String.fromCharCode(65 + idx) + ".";
+
+        const labelSpan = document.createElement("span");
+        labelSpan.className = "answer-label";
+        labelSpan.textContent = choiceText;
+
+        btn.appendChild(indexSpan);
+        btn.appendChild(labelSpan);
+
+        btn.addEventListener("click", () => handleAnswer(idx));
+
+        li.appendChild(btn);
+        answersListEl.appendChild(li);
+      });
+
+      // Si la question a déjà été répondue, afficher la correction
+      const savedAnswer = userAnswers[currentQuestionIndex];
+      if (savedAnswer !== null) {
+        showCorrection(savedAnswer);
+      }
+
+      updateProgress();
+      updateNavButtons();
+      updateScoreDisplay();
+    }
+
+    function handleAnswer(choiceIndex) {
+      const alreadyAnswered = userAnswers[currentQuestionIndex] !== null;
+
+      // Enregistrer la réponse si c'est la première fois
+      if (!alreadyAnswered) {
+        userAnswers[currentQuestionIndex] = choiceIndex;
+        const q = questions[currentQuestionIndex];
+        if (choiceIndex === q.correctIndex) {
+          score++;
+        }
+      }
+
+      showCorrection(userAnswers[currentQuestionIndex]);
+      updateScoreDisplay();
+    }
+
+    function showCorrection(selectedIndex) {
+      const q = questions[currentQuestionIndex];
+      const buttons = answersListEl.querySelectorAll(".answer-btn");
+
+      buttons.forEach((btn, idx) => {
+        btn.classList.remove("correct", "wrong", "disabled");
+        btn.disabled = true;
+        btn.classList.add("disabled");
+
+        if (idx === q.correctIndex) {
+          btn.classList.add("correct");
+        }
+        if (idx === selectedIndex && idx !== q.correctIndex) {
+          btn.classList.add("wrong");
+        }
+      });
+
+      if (selectedIndex === q.correctIndex) {
+        feedbackEl.textContent = "✅ Bonne réponse !";
+      } else {
+        const correctText = q.choices[q.correctIndex];
+        feedbackEl.textContent =
+          '❌ Mauvaise réponse. La bonne réponse était : "' +
+          correctText +
+          '".';
+      }
+      feedbackEl.classList.add("visible");
+    }
+
+    function updateNavButtons() {
+      prevBtn.disabled = currentQuestionIndex === 0;
+      nextBtn.disabled = currentQuestionIndex === questions.length - 1;
+    }
+
+    prevBtn.addEventListener("click", () => {
+      if (currentQuestionIndex > 0) {
+        currentQuestionIndex--;
+        renderQuestion();
+      }
+    });
+
+    nextBtn.addEventListener("click", () => {
+      if (currentQuestionIndex < questions.length - 1) {
+        currentQuestionIndex++;
+        renderQuestion();
+      }
+    });
+
+    resetBtn.addEventListener("click", () => {
+      if (
+        !confirm(
+          "Réinitialiser le QCM ? Toutes tes réponses et ton score seront effacés."
+        )
+      ) {
+        return;
+      }
+      startQuiz(modeSelect.value);
+    });
+
+    modeSelect.addEventListener("change", () => {
+      if (
+        !confirm(
+          "Changer de série ? Ton score et tes réponses actuelles seront réinitialisés."
+        )
+      ) {
+        // Revenir à l’ancienne valeur si l’utilisateur annule
+        // (simple solution : re-rendre la question sans changer le mode)
+        modeSelect.value = modeSelect.value;
+        return;
+      }
+      startQuiz(modeSelect.value);
+    });
+
+    // Initialisation : toute la banque
+    startQuiz("all");
+  </script>
+</body>
+</html>
