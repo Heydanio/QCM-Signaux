@@ -1,0 +1,179 @@
+* {
+  box-sizing: border-box;
+  font-family: 'Segoe UI', sans-serif;
+}
+
+body {
+  margin: 0;
+  background: #05070a;
+  color: #e7e7ea;
+  overflow: hidden;
+}
+
+#grain {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background-image: radial-gradient(rgba(255,255,255,0.06) 1px, transparent 0);
+  background-size: 3px 3px;
+  mix-blend-mode: screen;
+  opacity: 0.3;
+  animation: grainMove 2s infinite alternate;
+}
+
+@keyframes grainMove {
+  from { transform: translate3d(0,0,0); }
+  to { transform: translate3d(1px,-1px,0); }
+}
+
+#gameCanvas {
+  display: block;
+  margin: 0 auto;
+  background: #0b0e12;
+  border: 4px solid #1f2937;
+  width: 100vw;
+  height: 56.25vw;
+  max-height: 80vh;
+  max-width: 100%;
+}
+
+#ui {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+}
+
+#topBar {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 12px;
+  background: linear-gradient(90deg,#0f172a,#0b1220);
+  border-bottom: 2px solid #111827;
+  pointer-events: auto;
+}
+
+.info {
+  font-size: 14px;
+  letter-spacing: 1px;
+}
+
+#actions {
+  position: fixed;
+  bottom: 12px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: grid;
+  grid-template-columns: repeat(5, minmax(130px, 1fr));
+  gap: 10px;
+  width: min(900px, 95vw);
+  pointer-events: auto;
+}
+
+.action {
+  background: #111827;
+  color: #e5e7eb;
+  border: 1px solid #1f2937;
+  padding: 10px;
+  border-radius: 8px;
+  font-size: 14px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+}
+
+.action:active { transform: translateY(1px); }
+
+#cameraPanel {
+  position: fixed;
+  right: 12px;
+  top: 80px;
+  width: 320px;
+  background: rgba(10,12,20,0.9);
+  border: 1px solid #1f2937;
+  border-radius: 8px;
+  padding: 8px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.45);
+  display: none;
+  pointer-events: auto;
+}
+
+#cameraPanel.active { display: block; }
+
+#camGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 6px;
+  margin-top: 8px;
+}
+
+.camBtn {
+  background: #0f172a;
+  border: 1px solid #1f2937;
+  padding: 12px 6px;
+  color: #cbd5e1;
+  border-radius: 6px;
+  min-height: 60px;
+}
+
+#camInfo {
+  margin-top: 8px;
+  font-size: 13px;
+  min-height: 40px;
+}
+
+.panel {
+  position: fixed;
+  inset: 0;
+  background: rgba(4,7,12,0.95);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  pointer-events: auto;
+  text-align: center;
+}
+
+.panel.hidden { display: none; }
+
+.menu button, #stateOverlay button {
+  margin: 8px;
+  padding: 12px 18px;
+  font-size: 16px;
+  background: #111827;
+  border: 1px solid #1f2937;
+  color: #e5e7eb;
+  border-radius: 8px;
+}
+
+.hidden { display: none; }
+
+#stateOverlay {
+  font-size: 22px;
+  gap: 12px;
+}
+
+#debugPanel {
+  position: fixed;
+  left: 10px;
+  top: 90px;
+  background: rgba(0,0,0,0.7);
+  color: #7dd3fc;
+  font-family: monospace;
+  font-size: 12px;
+  padding: 8px;
+  border: 1px solid #0ea5e9;
+  max-width: 260px;
+  white-space: pre-wrap;
+  pointer-events: none;
+}
+
+@media (max-width: 768px) {
+  #actions {
+    grid-template-columns: repeat(2, 1fr);
+    bottom: 4px;
+  }
+  #cameraPanel {
+    width: calc(100% - 24px);
+    left: 12px;
+  }
+  .action { font-size: 13px; }
+  #topBar { font-size: 12px; }
+}
