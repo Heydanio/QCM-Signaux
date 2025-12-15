@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Veille Électrique</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div id="grain"></div>
+  <canvas id="gameCanvas" width="960" height="540" aria-label="Zone de jeu"></canvas>
+  <div id="ui">
+    <div id="topBar">
+      <div class="info" id="nightLabel">Nuit 1</div>
+      <div class="info" id="timeLabel">00:00</div>
+      <div class="info" id="energyLabel">Énergie 100%</div>
+    </div>
+    <div id="actions">
+      <button id="leftDoor" class="action">Blindage gauche (Q)</button>
+      <button id="leftLight" class="action">Lampe gauche (A)</button>
+      <button id="cameraToggle" class="action">Panneau caméras (E)</button>
+      <button id="rightLight" class="action">Lampe droite (D)</button>
+      <button id="rightDoor" class="action">Blindage droit (S)</button>
+    </div>
+    <div id="cameraPanel" aria-live="polite">
+      <div id="camHeader">
+        <span>Caméras</span>
+        <span id="camUsage">Charge: 0s</span>
+      </div>
+      <div id="camGrid"></div>
+      <div id="camInfo">Sélectionnez une zone pour afficher son état.</div>
+    </div>
+    <div id="menuOverlay" class="panel">
+      <h1>Veille Électrique</h1>
+      <div class="menu">
+        <button id="playBtn">Jouer</button>
+        <button id="optionsBtn">Options</button>
+        <button id="creditsBtn">Crédits</button>
+      </div>
+      <div id="credits" class="hidden">
+        <p>Prototype original conçu pour ce défi.</p>
+        <p>Design, code et sons générés à la volée.</p>
+      </div>
+      <div id="options" class="hidden">
+        <label>
+          Durée d'une nuit (secondes):
+          <input type="number" id="nightLengthInput" min="60" max="360" value="360">
+        </label>
+        <label>
+          Réduire les flashs
+          <input type="checkbox" id="reduceFlash">
+        </label>
+      </div>
+    </div>
+    <div id="stateOverlay" class="panel hidden"></div>
+    <div id="debugPanel" class="hidden"></div>
+  </div>
+  <script src="audio.js"></script>
+  <script src="game.js"></script>
+</body>
+</html>
